@@ -1,10 +1,8 @@
-import { Chess } from "chess.js"
+import { Chess } from "./chess"
 
 declare var netplayjs: any;
 
-const game = new Chess();
-console.log(game.ascii());
-
+const game = new Chess(8,8);
 
 class SimpleGame extends netplayjs.Game {
     // In the constructor, we initialize the state of our game.

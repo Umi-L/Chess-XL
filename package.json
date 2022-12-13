@@ -1,9 +1,11 @@
 {
   "dependencies": {
-    "chess.js": "^1.0.0-alpha.0",
-    "netplayjs": "^0.3.1"
+    "browserify": "^17.0.0",
+    "netplayjs": "^0.3.1",
+    "typescript": "^4.9.4"
   },
   "scripts": {
-    "build": "npx tsc && browserify ./dist/game.js -o ./dist/game.js && start ./index.html"
+    "build": "npx tsc && browserify ./dist/game.js -o ./dist/game.js && start ./index.html",
+    "buildl": "npx tsc && browserify ./dist/game.js -o ./dist/game.js && kde-open ./index.html"
   }
 }
