@@ -1,0 +1,32 @@
+.darksquare{
+    background-color: #b88b4a;
+    float: left;
+    /* text-align:center; */
+    display: table-cell;
+    /* vertical-align:middle; */
+}
+.lightsquare{
+    background-color: #e3c16f;
+    float: left;
+    /* text-align:center; */
+    display: table-cell;
+    /* vertical-align:middle; */
+}
+/* #board{
+    position: absolute;
+    left: 50%;
+} */
+.container{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    width: 100%;
+    height: 100%;
+}
+
+body{
+    margin: 0;
+    height: 100%;
+    background-color: #312e2b;
+}
