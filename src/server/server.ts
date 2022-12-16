@@ -52,6 +52,10 @@ io.on('connection', function(socket:any){                   //socket.io on conne
         }
     }
 
+    function sendClientInfo(){
+        io.sockets.socket(socket.id).emit("clientInfo")
+    }
+
     function shareState(){
         socket.emit("state", {board: game.board, turn: game.turn} as IState);
         console.log(game.board.peices);

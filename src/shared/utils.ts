@@ -13,4 +13,10 @@ export class Vector2{
     static multiply(vector: Vector2, mult: number): Vector2{
         return new Vector2(vector.x * mult, vector.y * mult);
     }
+    static equals(a:Vector2, b:Vector2){
+        if (a.x == b.x && a.y == b.y){
+            return true;
+        }
+        return false;
+    }
 }
