@@ -1,4 +1,5 @@
-import { Chess } from "../shared/chess"
+import { Chess, Color, Peice, Peices } from "../shared/chess"
+import { IState } from "../shared/messages";
 
 const game = new Chess(8, 8);
 
@@ -14,19 +15,21 @@ const heightMargin = 20;
 redrawGameBoard();
 
 //socket.io
-socket.on('userhashmap', function(msg:any){             //receive other player's info
-  userhashmap = msg;                              //put the other player's info into userhashmap
-});
 
 socket.on('connect', function() {
   console.log("hello " + socket.id);
   socketid = socket.id;                           //store socket.id for use in the game
 });
 
-socket.on('state', (msg:any) => {
-  game.board = msg;
+socket.on('state', (msg:IState) => {
+  console.log("state recived");
 
+  game.board = msg.board;
+  game.turn = msg.turn
 
+  console.log(game.board);
+
+  redrawGameBoard();
 });
 
 function redrawGameBoard(){
@@ -53,14 +56,70 @@ function redrawGameBoard(){
       else{
         square.setAttribute("class", (i % 2 == 0 ? "darksquare" : "lightsquare"));
       }
+
+      square.classList.add("square");
       square.setAttribute("style", `width: ${squareSize}; height: ${squareSize};`);
-      square.setAttribute("x", x.toString());
-      square.setAttribute("y", y.toString());
+      square.setAttribute("id", x.toString() + ":" + y.toString());
 
       boardElement.appendChild(square);
 
     }
   }
+
+  populateGameBoard();
+}
+function populateGameBoard(){
+  for (const peice of game.board.peices){
+    let square = document.getElementById(peice.pos.x + ":" + peice.pos.y);
+
+    if (!square){
+      console.error("squareDoesNotExist")
+      return
+    }
+
+    let svgElement = document.createElement("img");
+    svgElement.setAttribute("src", "assets/peices/" + getPeiceSvg(peice));
+    svgElement.classList.add("peice");
+
+    square.appendChild(svgElement);
+
+    //square!.setAttribute("style", "background-color: white;");
+  }
+}
+
+function getPeiceSvg(peice: Peice){
+  let prefix = "";
+  let body = ""
+
+  const suffix = "_svg_NoShadow.svg"
+
+  if (peice.color == Color.White)
+    prefix = "w_"
+  else
+    prefix = "b_"
+  
+  switch(peice.type){
+    case Peices.King:
+      body = "king";
+      break;
+    case Peices.Knight:
+      body = "knight";
+      break;
+    case Peices.Pawn:
+      body = "pawn";
+      break;
+    case Peices.Queen:
+      body = "queen";
+      break;
+    case Peices.Rook:
+      body = "rook";
+      break;
+    case Peices.bishop:
+      body = "bishop";
+      break;
+  }
+
+  return prefix + body + suffix;
 }
 
 window.onresize = redrawGameBoard;

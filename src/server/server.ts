@@ -1,4 +1,10 @@
 import express from "express";
+import { Socket } from "socket.io";
+import { Chess, Peice, Peices, Color } from "../shared/chess";
+import { IMove, IState } from "../shared/messages";
+import { Vector2 } from "../shared/utils";
+
+//-----------Networking------------
 
 var app = express();
 var http = require('http').Server(app);
@@ -8,12 +14,20 @@ var usercount = 0;
 var userhashmap = {};                                   //stores client information
 var port = process.env.PORT || 3000;                    //heroku port or default port 3000
 
+//game values
+const game = new Chess(12,8);
+
+game.board.peices.push({type: Peices.Queen, pos: new Vector2(0,0), color: Color.White} as Peice)
+
 app.get('/', function(req, res){                        //response handler
     res.sendFile(__dirname + '/index.html');            //default response
 });
+
 app.use('/dist', express.static('dist/client'));           //serve the assets folder
 app.use('/dist', express.static('dist/shared'));           //serve the assets folder
 app.use('/assets', express.static('assets'));                   //serve the js folder
+app.use('/assets/peices', express.static('assets/peices'));                   //serve the js folder
+
 //404
 app.use(function(req, res, next) {                      //404 response handler
     res.status(404).send('404: Sorry cant find that!'); //basic 404 response
@@ -38,7 +52,15 @@ io.on('connection', function(socket:any){                   //socket.io on conne
         }
     }
 
+    function shareState(){
+        socket.emit("state", {board: game.board, turn: game.turn} as IState);
+        console.log(game.board.peices);
+    }
+
     communicateJoin("+");                               //someone joins on io.on('connection', ...
+
+    shareState();
+    
 
     // setInterval(function () {                           //send out the list of connected sockets to all sockets
     //     if (usercount > 0) {
@@ -51,14 +73,17 @@ io.on('connection', function(socket:any){                   //socket.io on conne
         communicateJoin("-");
 
     });
-    socket.on('clientinfo', function(msg:any) {             //recieve info about the socket, i.e. their x, y, animation
 
-        userhashmap[socket.id as keyof Object] = msg;                   //and put it in userhashmap associated with their socket id
+    socket.on('move', (move: IMove)=>{
 
+        //if valid move make move then emit
+        if (game.move(move)){
+            shareState();
+        }
     });
 });
 
-
-http.listen(port, function(){                           //http serving
+//http serving
+http.listen(port, function(){
     console.log('listening on ' + port);
 });

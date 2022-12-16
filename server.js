@@ -4,14 +4,18 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
+const chess_1 = require("../shared/chess");
+//-----------Networking------------
 var app = (0, express_1.default)();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var usercount = 0;
 var userhashmap = {}; //stores client information
 var port = process.env.PORT || 3000; //heroku port or default port 3000
+//game values
+const game = new chess_1.Chess(8, 8);
 app.get('/', function (req, res) {
-    res.sendFile(__dirname + '/index.html'); //default response
+    res.sendFile('/index.html'); //default response
 });
 app.use('/dist', express_1.default.static('dist/client')); //serve the assets folder
 app.use('/dist', express_1.default.static('dist/shared')); //serve the assets folder
@@ -45,10 +49,11 @@ io.on('connection', function (socket) {
     socket.on('disconnect', function () {
         communicateJoin("-");
     });
-    socket.on('clientinfo', function (msg) {
-        userhashmap[socket.id] = msg; //and put it in userhashmap associated with their socket id
-    });
+    socket.on('move', onMove);
 });
+//http serving
 http.listen(port, function () {
     console.log('listening on ' + port);
 });
+function onMove(move) {
+}

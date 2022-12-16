@@ -1,7 +1,8 @@
 import { Vector2 } from "./utils"
 import { KING_OFFSETS, KNIGHT_OFFSETS, BISHOP_OFFSETS, QUEEN_OFFSETS, ROOK_OFFSETS } from "./offsets"
+import { IMove } from "./messages"
 
-interface Peice{
+export interface Peice{
     type: Peices,
     pos: Vector2,
     color: Color
@@ -13,7 +14,7 @@ interface Board{
     height: number
 }
 
-enum Peices{
+export enum Peices{
     Pawn,
     Knight,
     bishop,
@@ -22,9 +23,9 @@ enum Peices{
     King
 }
 
-enum Color{
+export enum Color{
     White,
-    black
+    Black
 }
 
 export class Chess{
@@ -40,26 +41,31 @@ export class Chess{
         this.turn = Color.White;
     }
 
-    move(p1: Vector2, p2: Vector2){
-        let peice = this.getPeiceAtPos(p1);
+    move(move: IMove): boolean{
+        let peice = this.getPeiceAtPos(move.original);
         if (!peice)
-            return;
+            return false;
         
         let possibleMoves = this.getMoves(peice);
 
-        for (const move of possibleMoves){
-            if (move == p2){
+        for (const possibleMove of possibleMoves){
+            if (possibleMove == move.moved){
 
                 //get rid of peice at pos
-                let peiceToDelete = this.getPeiceIndexAtPos(move);
+                let peiceToDelete = this.getPeiceIndexAtPos(possibleMove);
                 if (peiceToDelete){
                     this.board.peices.splice(peiceToDelete, 1);
                 }
 
-                peice.pos = p2;
+                peice.pos = move.moved;
+
+                this.flipTurn();
+
+                return true;
             }
         }
         
+        return false;
     }
 
     getMoves(peice:Peice): Array<Vector2>{
@@ -85,6 +91,15 @@ export class Chess{
                 break;
         }
         return posibleMoves;
+    }
+
+    private flipTurn(){
+        if (this.turn == Color.White){
+            this.turn = Color.Black
+        }
+        else{
+            this.turn = Color.White
+        }
     }
 
     private getSlidingPeiceMoves(pos: Vector2, offsets: Array<Vector2>){
